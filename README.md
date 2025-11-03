@@ -33,7 +33,7 @@ Perfect for real estate visualization, interior decorators, home remodeling insp
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/narender-rk10/Gen-AI-Home-Interior-Designer.git
+git clone https://github.com/tinh12345333344/Gen-AI-Home-Interior-Design.gitgit
 cd Gen-AI-Home-Interior-Designer
 ```
 
