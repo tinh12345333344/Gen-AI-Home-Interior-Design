@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # ⚙️ Service for the FastAPI Backend
+  backend:
+    container_name: gen-ai-designer-backend
+    build:
+      context: ./backend # Giả sử Dockerfile cho backend nằm trong thư mục 'backend'
+      dockerfile: Dockerfile
+    # image: your-backend-image:latest # Có thể dùng image nếu đã build sẵn
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - ./backend/.env # Tải biến môi trường (bao gồm GEMINI_API_KEY) từ file .env
+    ports:
+      - "8000:8000" # Mở cổng 8000 trên host, map tới cổng 8000 của container
+    volumes:
+      - ./backend:/app # Mount thư mục backend vào container để hỗ trợ --reload (phát triển)
+      - /app/poetry.lock # Tránh mount đè lên file lock
+    restart: always
+    # networks:
+    #   - gen-ai-network
+
+  # 🖥️ Service for the React Frontend
+  frontend:
+    container_name: gen-ai-designer-frontend
+    build:
+      context: ./frontend # Giả sử Dockerfile cho frontend nằm trong thư mục 'frontend'
+      dockerfile: Dockerfile
+    # image: your-frontend-image:latest # Có thể dùng image nếu đã build sẵn
+    ports:
+      - "3000:3000" # Mở cổng 3000 trên host, map tới cổng 3000 của container (port mặc định của React Dev Server)
+    volumes:
+      - ./frontend:/app # Mount thư mục frontend vào container (phát triển)
+      - /app/node_modules # Loại trừ node_modules để tránh lỗi permission/tốc độ chậm
+    depends_on:
+      - backend # Đảm bảo backend khởi động trước hoặc cùng lúc
+    restart: always
+    # networks:
+    #   - gen-ai-network
+
+# # 🌐 Docker Networks (Tùy chọn)
+# networks:
+#   gen-ai-network:
+#     driver: bridge
+
+# GHI CHÚ QUAN TRỌNG:
+# 1. Bạn cần tạo một file **Dockerfile** riêng cho thư mục 'backend' và 'frontend'
+#    để Docker Compose có thể build image.
+# 2. File `.env` chứa `GEMINI_API_KEY` phải nằm trong thư mục **backend**.
